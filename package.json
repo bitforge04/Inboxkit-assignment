@@ -1,0 +1,16 @@
+{
+  "name": "grid-app",
+  "version": "1.0.0",
+  "description": "Shared Grid — real-time multiplayer cell capture game",
+  "private": true,
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down -v",
+    "loadtest": "node scripts/loadtest.js"
+  }
+}
