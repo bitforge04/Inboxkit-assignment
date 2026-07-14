@@ -4,9 +4,41 @@ A shared 40×30 grid (1,200 cells) where any connected user can claim any cell i
 
 ---
 
+## Live Demo
+
+- **Frontend:** https://inboxkit-assignment-production-f1ef.up.railway.app
+- **Backend:** https://inboxkit-assignment-production.up.railway.app
+
+---
+
 ## Quick Start
 
-### Option A — Docker Compose (recommended)
+### Option A — Railway (deployed)
+
+Backend and frontend run as separate Railway services with Postgres and Redis plugins.
+
+Required backend environment variables:
+```
+DATABASE_URL=       # from Railway Postgres plugin
+REDIS_URL=          # from Railway Redis plugin
+NODE_ENV=production
+PORT=4000
+CORS_ORIGIN=        # your frontend Railway URL
+CLAIM_COOLDOWN_MS=2000
+STEAL_COOLDOWN_MS=5000
+GRID_COLS=40
+GRID_ROWS=30
+LEADERBOARD_SIZE=5
+```
+
+Required frontend environment variable:
+```
+VITE_SOCKET_URL=    # your backend Railway URL
+```
+
+Set backend root directory to `/backend` and frontend root directory to `/frontend` in Railway service settings.
+
+### Option B — Docker Compose (local)
 
 ```bash
 docker-compose up --build
@@ -16,12 +48,11 @@ docker-compose up --build
 - Backend API: http://localhost:4000
 - Health: http://localhost:4000/api/health
 
-> **Fresh start / permission issues:** If you see `grid_user was denied access` errors, the Postgres volume likely predates the current init scripts. Wipe it and rebuild:
+> **Permission issues:** If you see `grid_user was denied access`, wipe the volume and rebuild:
 > ```bash
-> docker compose down -v
-> docker compose up --build
+> docker compose down -v && docker compose up --build
 > ```
-> If you want to keep existing data, just re-run the grants manually:
+> To fix without losing data:
 > ```bash
 > docker compose exec postgres psql -U postgres -d grid_db -c \
 >   "GRANT USAGE ON SCHEMA public TO grid_user; \
@@ -30,24 +61,24 @@ docker-compose up --build
 > docker compose restart backend
 > ```
 
-### Option B — Local dev (requires Postgres + Redis running)
+### Option C — Local dev (requires Postgres + Redis running)
 
 ```bash
 # 1. Install deps
-cd backend  && npm install
+cd backend && npm install
 cd ../frontend && npm install
 
-# 2. Create backend/.env (copy from .env.example and fill in your DB/Redis URLs)
+# 2. Configure env
 cp backend/.env.example backend/.env
 
-# 3. Push DB schema + seed cells
+# 3. Run backend
 cd backend
 npx prisma migrate dev --name init
-npm run dev        # starts on :4000
+npm run dev        # :4000
 
-# 4. In another terminal
+# 4. Run frontend
 cd frontend
-npm run dev        # starts on :3000
+npm run dev        # :3000
 ```
 
 ---
